@@ -1,4 +1,4 @@
-document.getElementById("btn").addEventListener("click", change);
+document.getElementById("btn").addEventListener("click", change); //testtest
 document.getElementById("btn2").addEventListener("click", change2);
 var input = document.getElementById("input");
 var output = document.getElementById("output");
