@@ -16,7 +16,7 @@ pipeline {
             echo 'Make Backup (Move previous file to backup folder)'
             dir('/var/lib/jenkins/workspace/s3') { 
                 script{
-                    sh 'aws s3 mv s3://eric-website-bucket1231/ s3://eric-website-bucket1231/back-up --recursive --exclude "" --exclude "backup/*"--exclude "*" --include "index.html" --include "my.css" --include "my.js"' //백업파일 생성
+                    sh 'aws s3 mv s3://eric-website-bucket1231/ s3://eric-website-bucket1231/back-up --recursive --exclude \\"\\" --exclude "backup/*" --exclude "./*" --include "index.html" --include "my.css" --include "my.js"' //백업파일 생성
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
             echo 'Upload new files'
             dir('/var/lib/jenkins/workspace/s3') { 
                 script{
-                    sh 'aws s3 cp ./ s3://eric-website-bucket1231 --recursive --exclude "*" --include "index.html" --include "my.css" --include "my.js"' //이전 파일 삭제
+                    sh 'aws s3 cp ./ s3://eric-website-bucket1231 --recursive --exclude "./*" --include "index.html" --include "my.css" --include "my.js"' //이전 파일 삭제
                 }
             
             }
