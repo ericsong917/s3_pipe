@@ -26,7 +26,7 @@ pipeline {
             echo 'Upload new files'
             dir('/var/lib/jenkins/workspace/s3') { 
                 script{
-                    sh 'aws s3 cp ./ s3://eric-website-bucket1231 --recursive --exclude ".git/" --exclude "Jenkinsfile" --include ./*' //이전 파일 삭제
+                    sh 'aws s3 cp ./ s3://eric-website-bucket1231 --recursive --include "./*" --exclude ".git/" --exclude "Jenkinsfile" ' //이전 파일 삭제
                 }
             
             }
