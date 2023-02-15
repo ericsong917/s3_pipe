@@ -50,11 +50,12 @@ pipeline {
             def status = "invalid"
             sh 'cloudfrontid=E2TKCJR2BV15LJ'
             sh 'invalidationid=$(cat json.txt|jq ".Invalidation.Id")'
-            while(!(status.equals("Completed"))){
-              sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee /var/lib/jenkins/workspace/s3/inavalidation.txt'
-              sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
-              status =sh(script: "echo $status", returnStdout : true)
-            }
+            sh 'ls'
+            // while(!(status.equals("Completed"))){
+            //   sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee /var/lib/jenkins/workspace/s3/inavalidation.txt'
+            //   sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
+            //   status =sh(script: "echo $status", returnStdout : true)
+            // }
           }
         }
       }
