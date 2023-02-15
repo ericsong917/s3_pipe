@@ -49,9 +49,9 @@ pipeline {
         dir('/var/lib/jenkins/workspace/s3'){
           script{
             echo 'check invalidation status'
-            status = "invalid"
+            def status = "invalid"
             while(!(status.equals("Completed"))){
-              sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee inavalidation.txt'
+              sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee /var/lib/jenkins/workspace/s3/inavalidation.txt'
               sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
               status =sh(script: "echo $status", returnStdout : true)
             }
