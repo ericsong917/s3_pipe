@@ -37,9 +37,7 @@ pipeline {
         echo 'purge cloudfront cache'
         dir('/var/lib/jenkins/workspace/s3'){
           script{
-            sh 'cloudfrontid=E2TKCJR2BV15LJ'
             sh 'aws cloudfront create-invalidation --distribution-id E2TKCJR2BV15LJ --paths "/" "/index.html" "/my.css" "/my.js" | tee json.txt'
-            sh 'invalidationid=$(cat json.txt|jq ".Invalidation.Id") '
           }
         }
       }
@@ -50,6 +48,8 @@ pipeline {
           script{
             echo 'check invalidation status'
             def status = "invalid"
+            sh 'cloudfrontid=E2TKCJR2BV15LJ'
+            sh 'invalidationid=$(cat json.txt|jq ".Invalidation.Id")'
             while(!(status.equals("Completed"))){
               sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee /var/lib/jenkins/workspace/s3/inavalidation.txt'
               sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
