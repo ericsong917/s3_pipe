@@ -45,17 +45,20 @@ pipeline {
       }
     }
     stage('check_status'){
-      echo 'check invalidation status'
-      status = "invalid"
-      dir('/var/lib/jenkins/workspace/s3'){
-        script{
-          while(!(status.equals("Completed"))){
-            sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee inavalidation.txt'
-            sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
-            status =sh(script: "echo $status", returnStdout : true)
+      steps{
+        echo 'check invalidation status'
+        status = "invalid"
+        dir('/var/lib/jenkins/workspace/s3'){
+          script{
+            while(!(status.equals("Completed"))){
+              sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee inavalidation.txt'
+              sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
+              status =sh(script: "echo $status", returnStdout : true)
+            }
           }
         }
       }
+
     }
   }
 }
