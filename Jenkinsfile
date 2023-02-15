@@ -53,9 +53,10 @@ pipeline {
             sh 'echo $cloudfrontid'
             sh 'echo $invalidationid'
             while(!(status.equals("Completed"))){
-              sh "aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee /var/lib/jenkins/workspace/s3/invalidation.txt"
-              sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
-              status =sh(script: "echo $status", returnStdout : true)
+              sh 'echo test'
+              // sh "aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee /var/lib/jenkins/workspace/s3/invalidation.txt"
+              // sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
+              // status =sh(script: "echo $status", returnStdout : true)
             }
           }
         }
