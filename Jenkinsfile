@@ -32,11 +32,28 @@ pipeline {
             }
         }
     }
-    stage('Purge Cloudfront cache'){
+    stage('Purge Cloudfront cache, invalidation id store'){
       steps{
         echo 'purge cloudfront cache'
+        dir('/var/lib/jenkins/workspace/s3'){
+          script{
+            sh 'cloudfrontid=E2TKCJR2BV15LJ'
+            sh 'aws cloudfront create-invalidation --distribution-id E2TKCJR2BV15LJ --paths "/" "/index.html" "/my.css" "/my.js" | tee json.txt'
+            sh 'invalidationid=$(cat json.txt|jq ".Invalidation.Id") '
+          }
+        }
+      }
+    }
+    stage('check_status'){
+      echo 'check invalidation status'
+      status = "invalid"
+      dir('/var/lib/jenkins/workspace/s3'){
         script{
-          sh 'aws cloudfront create-invalidation --distribution-id E2TKCJR2BV15LJ --paths "/" "/index.html" "/my.css" "/my.js" | tee json.txt'
+          while(!(status.equals("Completed"))){
+            sh 'aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee inavalidation.txt'
+            sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
+            status =sh(script: "echo $status", returnStdout : true)
+          }
         }
       }
     }
