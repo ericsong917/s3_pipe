@@ -26,7 +26,7 @@ pipeline {
             echo 'Upload new files'
             dir('/var/lib/jenkins/workspace/s3') { 
                 script{
-                    sh 'aws s3 cp ./ s3://eric-website-bucket1231 --recursive --include "./*" --exclude ".git/*" --exclude "Jenkinsfile" ' //이전 파일 삭제
+                    sh 'aws s3 cp ./ s3://eric-website-bucket1231 --recursive --include "./*" --exclude ".git/*" --exclude "Jenkinsfile" --exclude "invalidation.txt" --exclude "json.txt"' //이전 파일 삭제
                 }
             
             }
@@ -46,17 +46,26 @@ pipeline {
       steps{
         dir('/var/lib/jenkins/workspace/s3'){
           script{
+            env.cloudfrontid = "E2TKCJR2BV15LJ"
             echo 'check invalidation status'
-            def status = "invalid"
-            sh 'cloudfrontid="E2TKCJR2BV15LJ" '
-            sh 'invalidationid=$(cat json.txt|jq ".Invalidation.Id")'
-            sh 'echo $cloudfrontid'
-            sh 'echo $invalidationid'
-            while(!(status.equals("Completed"))){
-              sh 'echo test'
-              // sh "aws cloudfront get-invalidation --distribution-id $cloudfrontid --id $invalidationid | tee /var/lib/jenkins/workspace/s3/invalidation.txt"
-              // sh 'status=$(cat invalidation.txt|jq ".Invalidation.Status")'
-              // status =sh(script: "echo $status", returnStdout : true)
+            // sh 'cloudfrontid="E2TKCJR2BV15LJ" '
+            // sh 'invalidationid=$(cat json.txt|jq ".Invalidation.Id")'
+            env.invalidationid =sh(script: 'cat json.txt|jq -r ".Invalidation.Id"', returnStdout : true)
+            // env.status="invalid"
+            def check = true
+            while(check){
+              writeFile file: 'invalidation.txt', text: '  '
+              sh 'chmod 777 invalidation.txt'
+              sh 'aws cloudfront get-invalidation --distribution-id ${cloudfrontid} --id ${invalidationid} > ./invalidation.txt'             
+              sh 'cat ./invalidation.txt'
+              def tmp = ""
+              tmp = sh(script:'cat invalidation.txt|jq -r ".Invalidation.Status"',returnStdout:true ).toString().trim()
+              if(tmp=="Completed" || tmp.equals("Completed")){
+                check=false
+              }
+              else{
+                echo tmp
+              }
             }
           }
         }
