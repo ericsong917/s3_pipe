@@ -36,7 +36,7 @@ pipeline {
       steps{
         echo 'purge cloudfront cache'
         script{
-          sh 'aws cloudfront create-invalidation --distribution-id E2TKCJR2BV15LJ --paths "/" "/index.html" "/my.css" "/my.js" '
+          sh 'aws cloudfront create-invalidation --distribution-id E2TKCJR2BV15LJ --paths "/" "/index.html" "/my.css" "/my.js" | tee json.txt'
         }
       }
     }
