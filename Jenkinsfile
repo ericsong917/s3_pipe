@@ -11,7 +11,7 @@ pipeline {
         git credentialsId: 'token_for_github', url: 'https://github.com/ericsong917/s3_pipe'
       }
     }
-    stage('MakeBackup') {
+    stage('MakeBackup') { //기존 파일 백업폴더에 옮김
         steps {
             echo 'Make Backup (Move previous file to backup folder)'
             dir('/var/lib/jenkins/workspace/s3') { 
@@ -21,7 +21,7 @@ pipeline {
             }
         }
     }
-    stage('Upload new files') {
+    stage('Upload new files') { //새로 업데이트된 파일 업로드
         steps {
             echo 'Upload new files'
             dir('/var/lib/jenkins/workspace/s3') { 
@@ -32,17 +32,17 @@ pipeline {
             }
         }
     }
-    stage('Purge Cloudfront cache, invalidation id store'){
+    stage('Purge Cloudfront cache, invalidation id store'){ //클라우드 프론트 캐시 무효화 리소스 생성, 무효화 json 정보를 저장
       steps{
         echo 'purge cloudfront cache'
         dir('/var/lib/jenkins/workspace/s3'){
           script{
             sh 'aws cloudfront create-invalidation --distribution-id E2TKCJR2BV15LJ --paths "/" "/index.html" "/my.css" "/my.js" | tee json.txt'
-          }
+          } 
         }
       }
     }
-    stage('check_status'){
+    stage('check_status'){ //클라우드 프론트 캐시 무효화 상태 체크
       steps{
         dir('/var/lib/jenkins/workspace/s3'){
           script{
